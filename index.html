@@ -292,6 +292,8 @@
   }
 
   loop();
+
+  navigator?.serviceWorker.register('/kiro-asteroids/service-worker.js', { scope: '/kiro-asteroids/' });
 </script>
 </body>
 </html>
