@@ -16,6 +16,16 @@
   canvas.width = canvas.clientWidth;
   canvas.height = canvas.clientHeight;
 
+  window.addEventListener('resize', () => {
+    const scaleX = canvas.clientWidth  / canvas.width;
+    const scaleY = canvas.clientHeight / canvas.height;
+    canvas.width  = canvas.clientWidth;
+    canvas.height = canvas.clientHeight;
+    ship.x *= scaleX; ship.y *= scaleY;
+    for (const a of asteroids) { a.x *= scaleX; a.y *= scaleY; }
+    for (const b of bullets)   { b.x *= scaleX; b.y *= scaleY; }
+  });
+
   const ship = {
     x: canvas.width / 2,
     y: canvas.height / 2,
