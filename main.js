@@ -5,6 +5,12 @@ import asteroids from './modules/asteroids.js';
 import bullets from './modules/bullets.js';
 import ui from './modules/ui.js';
 import sound from './modules/sound.js';
+import { initMobile } from './modules/mobile.js';
+
+initMobile(() => ship.angle, () => {
+    const canRestart = (state.gameOver || state.complete) && restartAllowed;
+    if (canRestart) init();
+});
 
 const INITIAL_ASTEROIDS = 5;
 const INVULN_FRAMES     = 120;
@@ -30,13 +36,23 @@ function onShipHit() {
     if (hasLivesRemaining) {
         state.invulnerableFrames = INVULN_FRAMES;
         ship.reset();
+    } else {
+        onGameEnd();
     }
+}
+
+let restartAllowed = false;
+
+function onGameEnd() {
+    restartAllowed = false;
+    setTimeout(() => { restartAllowed = true; }, 1500);
 }
 
 function init() {
     state.score = 0;
     state.lives = 3;
     state.invulnerableFrames = 0;
+    state._endTriggered = false;
     ship.reset();
     bullets.list.length = 0;
     asteroids.list.length = 0;
@@ -56,7 +72,7 @@ requestAnimationFrame(function loop() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     const restartPressed = keys.get('r') || keys.get('R');
-    const canRestart     = state.gameOver || state.complete;
+    const canRestart     = (state.gameOver || state.complete) && restartAllowed;
     if (restartPressed && canRestart) init();
 
     if (!state.gameOver) {
@@ -72,6 +88,10 @@ requestAnimationFrame(function loop() {
     bullets.updateAndDraw();
     asteroids.draw();
 
+    if ((state.gameOver || state.complete) && !restartAllowed && !state._endTriggered) {
+        state._endTriggered = true;
+        onGameEnd();
+    }
     if (state.gameOver || state.complete) ui.overlay.draw(state.complete);
 });
 
