@@ -94,7 +94,7 @@
   });
   document.addEventListener('keyup', e => { if (e.key === ' ') canShoot = true; });
   document.addEventListener('keydown', e => {
-    if ((e.key === 'r' || e.key === 'R') && lives <= 0) {
+    if ((e.key === 'r' || e.key === 'R') && (lives <= 0 || asteroids.length === 0)) {
       lives = 3; score = 0; invulnerable = 0;
       ship.x = canvas.width / 2; ship.y = canvas.height / 2;
       ship.vx = 0; ship.vy = 0; ship.angle = 0;
@@ -278,11 +278,12 @@
     }
 
     // game over overlay — drawn last so it's on top
-    if (gameOver) {
+    const complete = asteroids.length === 0 && !gameOver;
+    if (gameOver || complete) {
       ctx.fillStyle = '#fff';
       ctx.textAlign = 'center';
       ctx.font = '64px "Press Start 2P", monospace';
-      ctx.fillText('GAME OVER', canvas.width / 2, canvas.height / 2 - 40);
+      ctx.fillText(complete ? 'COMPLETE!' : 'GAME OVER', canvas.width / 2, canvas.height / 2 - 40);
       ctx.font = '20px "Press Start 2P", monospace';
       ctx.fillText('PRESS R TO RESTART', canvas.width / 2, canvas.height / 2 + 30);
       ctx.textAlign = 'left';
