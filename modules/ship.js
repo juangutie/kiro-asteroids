@@ -81,6 +81,10 @@ const ship = {
         }
         this.vx *= this.braking ? 0.94 : this.friction;
         this.vy *= this.braking ? 0.94 : this.friction;
+        if (this.braking) {
+            this.vx -= Math.sin(this.angle) * this.thrust * 0.5;
+            this.vy += Math.cos(this.angle) * this.thrust * 0.5;
+        }
 
         if (this.thrusting || this.braking || this.turningLeft || this.turningRight) {
             const speed = Math.sqrt(this.vx * this.vx + this.vy * this.vy);
