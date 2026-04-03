@@ -1,5 +1,6 @@
 import { ctx } from './canvas.js';
 import ship from './ship.js';
+import sound from './sound.js';
 
 const BULLET_SPEED = 10;
 const BULLET_LIFE  = 60;
@@ -11,6 +12,7 @@ const bullets = {
     tryShoot(spaceDown) {
         if (spaceDown && this._canShoot) {
             this._canShoot = false;
+            sound.shoot();
             this.list.push({
                 x: ship.x + Math.sin(ship.angle) * 40,
                 y: ship.y - Math.cos(ship.angle) * 40,

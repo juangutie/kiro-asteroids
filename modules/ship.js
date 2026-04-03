@@ -1,5 +1,6 @@
 import { canvas, ctx } from './canvas.js';
 import { keys } from './input.js';
+import sound from './sound.js';
 
 const SHIP_PATH = new Path2D();
 SHIP_PATH.moveTo(0, -40);
@@ -80,6 +81,11 @@ const ship = {
         }
         this.vx *= this.braking ? 0.94 : this.friction;
         this.vy *= this.braking ? 0.94 : this.friction;
+
+        if (this.thrusting || this.braking || this.turningLeft || this.turningRight) {
+            const speed = Math.sqrt(this.vx * this.vx + this.vy * this.vy);
+            sound.thrust(speed);
+        }
         this.x += this.vx;
         this.y += this.vy;
         if (this.x < 0) this.x = canvas.width;

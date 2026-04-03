@@ -4,6 +4,7 @@ import ship from './modules/ship.js';
 import asteroids from './modules/asteroids.js';
 import bullets from './modules/bullets.js';
 import ui from './modules/ui.js';
+import sound from './modules/sound.js';
 
 const INITIAL_ASTEROIDS = 5;
 const INVULN_FRAMES     = 120;
@@ -23,6 +24,7 @@ function onAsteroidScored(pts) {
 function onShipHit() {
     const isInvulnerable = state.invulnerableFrames > 0;
     if (isInvulnerable) return;
+    sound.collision();
     state.lives--;
     const hasLivesRemaining = state.lives > 0;
     if (hasLivesRemaining) {

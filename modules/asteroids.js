@@ -1,4 +1,5 @@
 import { canvas, ctx } from './canvas.js';
+import sound from './sound.js';
 
 const SIZES        = { large: 90,  medium: 45, small: 20  };
 const POINTS       = { large: 20,  medium: 50, small: 100 };
@@ -47,6 +48,7 @@ const asteroids = {
                 const b = bullets[j];
                 const dx = b.x - a.x, dy = b.y - a.y;
                 if (Math.sqrt(dx * dx + dy * dy) < SIZES[a.size]) {
+                    sound.collision();
                     onScore(POINTS[a.size]);
                     bullets.splice(j, 1);
                     if (NEXT[a.size]) {
@@ -60,7 +62,9 @@ const asteroids = {
 
             if (i < this.list.length) {
                 const dx = ship.x - a.x, dy = ship.y - a.y;
-                if (Math.sqrt(dx * dx + dy * dy) < SIZES[a.size] + SHIP_RADIUS) onHit();
+                if (Math.sqrt(dx * dx + dy * dy) < SIZES[a.size] + SHIP_RADIUS) {
+                    onHit();
+                }
             }
         }
     },
