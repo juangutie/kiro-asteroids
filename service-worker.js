@@ -1,9 +1,19 @@
 const REPOSITORY = "kiro-asteroids";
-const CACHE_VERSION = "v2";
+const CACHE_VERSION = "v3";
 const URLS = [
     "/",
     "/favicon.ico",
     "/index.html",
+    "/main.js",
+    "/modules/asteroids.js",
+    "/modules/bullets.js",
+    "/modules/canvas.js",
+    "/modules/input.js",
+    "/modules/mobile.js",
+    "/modules/mouse.js",
+    "/modules/ship.js",
+    "/modules/sound.js",
+    "/modules/ui.js",
 ].map((url) => `/${REPOSITORY}${url}`);
 
 self.addEventListener("install", (event) => {
