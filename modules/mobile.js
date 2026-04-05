@@ -31,7 +31,7 @@ function startTouch(onTap) {
 }
 
 export function initMobile(getShipAngle, onTap) {
-    try { screen.orientation?.lock('portrait'); } catch(e) {}
+    try { screen.orientation?.lock('portrait').catch(() => {}); } catch(e) {}
     if (typeof DeviceOrientationEvent?.requestPermission === 'function') {
         window.addEventListener('touchend', async function onFirstTouch(e) {
             e.preventDefault();
