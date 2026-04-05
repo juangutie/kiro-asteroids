@@ -1,5 +1,5 @@
 const REPOSITORY = "kiro-asteroids";
-const CACHE_VERSION = "v4";
+const CACHE_VERSION = "v5";
 const URLS = [
     "/",
     "/favicon.ico",
@@ -14,12 +14,29 @@ const URLS = [
     "/modules/ship.js",
     "/modules/sound.js",
     "/modules/ui.js",
-].map((url) => `/${REPOSITORY}${url}`);
+]
+.map((url) => `/${REPOSITORY}${url}`)
+.map((url) => new Request(url, {cache: "no-cache"}));
 
 self.addEventListener("install", (event) => {
     event.waitUntil(
         caches.open(`${REPOSITORY}_${CACHE_VERSION}`).then((cache) =>
-            cache.addAll(URLS)
+            cache.addAll(URLS).then(() =>
+                URLS.map((request) =>
+                    cache.match(request).then((response) => {
+                        const updatedHeaders = new Headers(response.headers);
+                        updatedHeaders.set("Cache-Control", "no-cache");
+        
+                        const updatedResponse = new Response(response.body, {
+                            status: response.status,
+                            statusText: response.statusText,
+                            headers: updatedHeaders,
+                        });
+        
+                        return cache.put(request, updatedResponse);
+                    })
+                )
+            )
         )
     );
 });
