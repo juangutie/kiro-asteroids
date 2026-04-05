@@ -1,5 +1,5 @@
 const REPOSITORY = "kiro-asteroids";
-const CACHE_VERSION = "v5";
+const CACHE_VERSION = "v6";
 const URLS = [
     "/",
     "/favicon.ico",
@@ -56,11 +56,32 @@ self.addEventListener("activate", (event) => {
 self.addEventListener("fetch", (event) => {
     event.respondWith(
         caches.match(event.request).then((response) =>
-            response ?? fetch(event.request).catch((error) => 
-                new Response(error, {
-                    status: 408,
-                    headers: {"Content-Type": "text/plain"}
-                })
+            response ?? fetch(event.request).then(
+                (response) => {
+                    if (response.ok) {
+                        const responseCopy = response.clone();
+                        event.waitUntil(
+                            caches.open(`${REPOSITORY}_${CACHE_VERSION}`).then((cache) => {
+                                const updatedHeaders = new Headers(response.headers);
+                                updatedHeaders.set("Cache-Control", "no-cache");
+
+                                const updatedResponse = new Response(responseCopy.body, {
+                                    status: response.status,
+                                    statusText: response.statusText,
+                                    headers: updatedHeaders,
+                                });
+                                
+                                cache.put(event.request, updatedResponse)
+                            })
+                        );
+                    }
+                    return response;
+                },
+                (error) => 
+                    new Response(error, {
+                        status: 408,
+                        headers: {"Content-Type": "text/plain"}
+                    })
             )
         )
     );
