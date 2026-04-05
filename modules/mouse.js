@@ -13,8 +13,8 @@ const state = { up: false, down: false, left: false, right: false };
 
 export function getMouseState() { return state; }
 
-export function drawTurnZone(ctx, ship) {
-    if (mouseX === null) return;
+export function drawTurnZone(ctx, ship, hidden = false) {
+    if (hidden || mouseX === null) return;
     const dist = Math.hypot(mouseX - ship.x, mouseY - ship.y);
     const inTurnZone = dist <= TURN_ZONE;
     if (!(!held && inTurnZone) && !(held && mode === 'turn')) return;

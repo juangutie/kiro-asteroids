@@ -95,7 +95,7 @@ requestAnimationFrame(function loop() {
         onGameEnd();
     }
     if (state.gameOver || state.complete) ui.overlay.draw(state.complete);
-    drawTurnZone(ctx, ship);
+    drawTurnZone(ctx, ship, state.gameOver);
 });
 
 navigator?.serviceWorker.register('/kiro-asteroids/service-worker.js', { scope: '/kiro-asteroids/' });
