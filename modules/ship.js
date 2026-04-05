@@ -1,5 +1,6 @@
 import { canvas, ctx } from './canvas.js';
 import { keys } from './input.js';
+import { getMouseState } from './mouse.js';
 import sound from './sound.js';
 
 const SHIP_PATH = new Path2D();
@@ -68,10 +69,11 @@ const ship = {
     },
 
     update() {
-        this.thrusting    = Boolean(keys.get('ArrowUp')    || keys.get('w'));
-        this.braking      = Boolean(keys.get('ArrowDown')  || keys.get('s'));
-        this.turningLeft  = Boolean(keys.get('ArrowLeft')  || keys.get('a'));
-        this.turningRight = Boolean(keys.get('ArrowRight') || keys.get('d'));
+        const mouse = getMouseState();
+        this.thrusting    = Boolean(keys.get('ArrowUp')    || keys.get('w') || mouse.up);
+        this.braking      = Boolean(keys.get('ArrowDown')  || keys.get('s') || mouse.down);
+        this.turningLeft  = Boolean(keys.get('ArrowLeft')  || keys.get('a') || mouse.left);
+        this.turningRight = Boolean(keys.get('ArrowRight') || keys.get('d') || mouse.right);
 
         if (this.turningLeft)  this.angle -= this.rotSpeed;
         if (this.turningRight) this.angle += this.rotSpeed;

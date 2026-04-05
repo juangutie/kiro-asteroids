@@ -6,11 +6,13 @@ import bullets from './modules/bullets.js';
 import ui from './modules/ui.js';
 import sound from './modules/sound.js';
 import { initMobile } from './modules/mobile.js';
+import { initMouse, drawTurnZone } from './modules/mouse.js';
 
 initMobile(() => ship.angle, () => {
     const canRestart = (state.gameOver || state.complete) && restartAllowed;
     if (canRestart) init();
 });
+initMouse(() => ship);
 
 const INITIAL_ASTEROIDS = 5;
 const INVULN_FRAMES     = 120;
@@ -93,6 +95,7 @@ requestAnimationFrame(function loop() {
         onGameEnd();
     }
     if (state.gameOver || state.complete) ui.overlay.draw(state.complete);
+    drawTurnZone(ctx, ship);
 });
 
 navigator?.serviceWorker.register('/kiro-asteroids/service-worker.js', { scope: '/kiro-asteroids/' });
