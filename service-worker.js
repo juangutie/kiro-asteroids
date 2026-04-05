@@ -1,5 +1,5 @@
 const REPOSITORY = "kiro-asteroids";
-const CACHE_VERSION = "v8";
+const CACHE_VERSION = "v9";
 const URLS = [
     "/",
     "/favicon.ico",
@@ -18,23 +18,25 @@ const URLS = [
 .map((url) => `/${REPOSITORY}${url}`)
 .map((url) => new Request(url, {cache: "no-cache"}));
 
+function setNoCache(response) {
+    const updatedHeaders = new Headers(response.headers);
+    updatedHeaders.set("Cache-Control", "no-cache");
+
+    return new Response(response.body, {
+        status: response.status,
+        statusText: response.statusText,
+        headers: updatedHeaders,
+    });
+}
+
 self.addEventListener("install", (event) => {
     event.waitUntil(
         caches.open(`${REPOSITORY}_${CACHE_VERSION}`).then((cache) =>
             cache.addAll(URLS).then(() =>
                 URLS.map((request) =>
-                    cache.match(request).then((response) => {
-                        const updatedHeaders = new Headers(response.headers);
-                        updatedHeaders.set("Cache-Control", "no-cache");
-        
-                        const updatedResponse = new Response(response.body, {
-                            status: response.status,
-                            statusText: response.statusText,
-                            headers: updatedHeaders,
-                        });
-        
-                        return cache.put(request, updatedResponse);
-                    })
+                    cache.match(request).then((response) =>
+                        cache.put(request, setNoCache(response))
+                    )
                 )
             )
         )
@@ -61,18 +63,9 @@ self.addEventListener("fetch", (event) => {
                     if (response.ok) {
                         const responseCopy = response.clone();
                         event.waitUntil(
-                            caches.open(`${REPOSITORY}_${CACHE_VERSION}`).then((cache) => {
-                                const updatedHeaders = new Headers(response.headers);
-                                updatedHeaders.set("Cache-Control", "no-cache");
-
-                                const updatedResponse = new Response(responseCopy.body, {
-                                    status: response.status,
-                                    statusText: response.statusText,
-                                    headers: updatedHeaders,
-                                });
-                                
-                                cache.put(event.request, updatedResponse)
-                            })
+                            caches.open(`${REPOSITORY}_${CACHE_VERSION}`).then((cache) =>
+                                cache.put(event.request, setNoCache(responseCopy))
+                            )
                         );
                     }
                     return response;
