@@ -58,7 +58,8 @@ function update(ship) {
     const a = ((Math.atan2(dx, -dy) - ship.angle + Math.PI * 3) % (Math.PI * 2)) - Math.PI;
 
     if (mode === 'turn') {
-        ship.angle += Math.abs(a) > ship.rotSpeed ? Math.sign(a) * ship.rotSpeed : a;
+        state.left  = a < -ship.rotSpeed;
+        state.right = a >  ship.rotSpeed;
     } else {
         const fwd  = Math.cos(a);
         const side = Math.sin(a);
