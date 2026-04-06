@@ -1,6 +1,6 @@
 import { canvas, ctx, onResize } from './modules/canvas.js';
-import { keys } from './modules/input.js';
-import ship from './modules/ship.js';
+import { input } from './modules/input.js';
+import ship, { INVULN_FRAMES } from './modules/ship.js';
 import asteroids from './modules/asteroids.js';
 import bullets from './modules/bullets.js';
 import ui from './modules/ui.js';
@@ -8,64 +8,55 @@ import sound from './modules/sound.js';
 import { initMobile } from './modules/mobile.js';
 import { initMouse, drawTurnZone } from './modules/mouse.js';
 
-initMobile(() => ship.angle, () => {
-    const canRestart = (state.gameOver || state.complete) && restartAllowed;
-    if (canRestart) init();
-});
-initMouse(() => ship);
+// 'playing' | 'gameover' | 'complete'
+let state = 'playing';
+let score = 0;
+let restartAllowed = false;
 
-const INITIAL_ASTEROIDS = 5;
-const INVULN_FRAMES     = 120;
-
-const state = {
-    score: 0,
-    lives: 3,
-    invulnerableFrames: 0,
-    get gameOver() { return this.lives <= 0; },
-    get complete() { return asteroids.list.length === 0 && !this.gameOver; },
-};
-
-function onAsteroidScored(pts) {
-    state.score += pts;
-}
-
-function onShipHit() {
-    const isInvulnerable = state.invulnerableFrames > 0;
-    if (isInvulnerable) return;
-    sound.collision();
-    state.lives--;
-    const hasLivesRemaining = state.lives > 0;
-    if (hasLivesRemaining) {
-        state.invulnerableFrames = INVULN_FRAMES;
-        ship.reset();
-    } else {
-        onGameEnd();
+function setState(s) {
+    state = s;
+    if (s !== 'playing') {
+        restartAllowed = false;
+        setTimeout(() => { restartAllowed = true; }, 1500);
     }
 }
 
-let restartAllowed = false;
+function onAsteroidScored(pts) {
+    score += pts;
+}
 
-function onGameEnd() {
-    restartAllowed = false;
-    setTimeout(() => { restartAllowed = true; }, 1500);
+function onShipHit() {
+    if (ship.invulnerableFrames > 0) return;
+    sound.collision();
+    ship.lives--;
+    if (ship.lives > 0) {
+        ship.invulnerableFrames = INVULN_FRAMES;
+        ship.reset();
+    } else {
+        setState('gameover');
+    }
 }
 
 function init() {
-    state.score = 0;
-    state.lives = 3;
-    state.invulnerableFrames = 0;
-    state._endTriggered = false;
-    ship.reset();
+    score = 0;
+    restartAllowed = false;
+    ship.fullReset();
     bullets.list.length = 0;
     asteroids.list.length = 0;
-    for (let i = 0; i < INITIAL_ASTEROIDS; i++) asteroids.spawnAtEdge('large');
+    asteroids.spawnInitial();
+    setState('playing');
+}
+
+function scaleEntities(entities, scaleX, scaleY) {
+    for (const e of entities) { e.x *= scaleX; e.y *= scaleY; }
 }
 
 onResize((scaleX, scaleY) => {
-    ship.x *= scaleX; ship.y *= scaleY;
-    for (const a of asteroids.list) { a.x *= scaleX; a.y *= scaleY; }
-    for (const b of bullets.list)   { b.x *= scaleX; b.y *= scaleY; }
+    scaleEntities([ship, ...asteroids.list, ...bullets.list], scaleX, scaleY);
 });
+
+initMobile(() => ship.angle, () => { if (restartAllowed) init(); });
+initMouse(() => ship);
 
 init();
 
@@ -73,29 +64,21 @@ requestAnimationFrame(function loop() {
     requestAnimationFrame(loop);
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    const restartPressed = keys.get('r') || keys.get('R');
-    const canRestart     = (state.gameOver || state.complete) && restartAllowed;
-    if (restartPressed && canRestart) init();
+    if (input.isRestarting() && restartAllowed) init();
 
-    if (!state.gameOver) {
-        ship.update();
-        bullets.tryShoot(keys.get(' '));
-        asteroids.update(bullets.list, ship, onAsteroidScored, onShipHit);
+    ship.update();
+    asteroids.drift();
+    bullets.update();
+
+    if (state === 'playing') {
+        asteroids.checkCollisions(bullets.list, ship, onAsteroidScored, onShipHit);
+        if (asteroids.list.length === 0) setState('complete');
     }
-    if (state.invulnerableFrames > 0) state.invulnerableFrames--;
 
-    ship.draw(state.lives, state.invulnerableFrames);
-    ui.score.draw(state.score);
-    ui.lives.draw(state.lives);
-    bullets.updateAndDraw();
+    ship.draw();
     asteroids.draw();
-
-    if ((state.gameOver || state.complete) && !restartAllowed && !state._endTriggered) {
-        state._endTriggered = true;
-        onGameEnd();
-    }
-    if (state.gameOver || state.complete) ui.overlay.draw(state.complete);
-    drawTurnZone(ctx, ship, state.gameOver);
+    ui.draw(state, score, ship.lives);
+    drawTurnZone(ctx, ship, state === 'gameover');
 });
 
 navigator?.serviceWorker.register('/kiro-asteroids/service-worker.js', { scope: '/kiro-asteroids/' });

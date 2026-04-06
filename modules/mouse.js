@@ -1,4 +1,4 @@
-import { keys } from './input.js';
+import { keys, mouse } from './input.js';
 
 const THRESHOLD = 0.3;
 const DEAD_ZONE = 84;  // ~30% smaller than 120
@@ -9,10 +9,6 @@ let mouseX = null, mouseY = null;
 let held = false;
 
 // internal state — read by ship.js via getMouseState()
-const state = { up: false, down: false, left: false, right: false };
-
-export function getMouseState() { return state; }
-
 export function drawTurnZone(ctx, ship, hidden = false) {
     if (hidden || mouseX === null) return;
     const dist = Math.hypot(mouseX - ship.x, mouseY - ship.y);
@@ -45,7 +41,7 @@ export function drawTurnZone(ctx, ship, hidden = false) {
 }
 
 function update(ship) {
-    state.up = state.down = state.left = state.right = false;
+    mouse.up = mouse.down = mouse.left = mouse.right = false;
 
     if (!held || mouseX === null) return;
 
@@ -58,15 +54,15 @@ function update(ship) {
     const a = ((Math.atan2(dx, -dy) - ship.angle + Math.PI * 3) % (Math.PI * 2)) - Math.PI;
 
     if (mode === 'turn') {
-        state.left  = a < -ship.rotSpeed;
-        state.right = a >  ship.rotSpeed;
+        mouse.left  = a < -ship.rotSpeed;
+        mouse.right = a >  ship.rotSpeed;
     } else {
         const fwd  = Math.cos(a);
         const side = Math.sin(a);
-        state.up    = fwd  >  THRESHOLD;
-        state.down  = fwd  < -THRESHOLD;
-        state.left  = side < -THRESHOLD;
-        state.right = side >  THRESHOLD;
+        mouse.up    = fwd  >  THRESHOLD;
+        mouse.down  = fwd  < -THRESHOLD;
+        mouse.left  = side < -THRESHOLD;
+        mouse.right = side >  THRESHOLD;
     }
 }
 

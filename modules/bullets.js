@@ -1,5 +1,4 @@
 import { ctx } from './canvas.js';
-import ship from './ship.js';
 import sound from './sound.js';
 
 const BULLET_SPEED = 10;
@@ -7,24 +6,19 @@ const BULLET_LIFE  = 60;
 
 const bullets = {
     list: [],
-    _canShoot: true,
 
-    tryShoot(spaceDown) {
-        if (spaceDown && this._canShoot) {
-            this._canShoot = false;
-            sound.shoot();
-            this.list.push({
-                x: ship.x + Math.sin(ship.angle) * 40,
-                y: ship.y - Math.cos(ship.angle) * 40,
-                vx: Math.sin(ship.angle) * BULLET_SPEED + ship.vx,
-                vy: -Math.cos(ship.angle) * BULLET_SPEED + ship.vy,
-                life: BULLET_LIFE,
-            });
-        }
-        if (!spaceDown) this._canShoot = true;
+    spawn(x, y, angle, vx, vy) {
+        sound.shoot();
+        this.list.push({
+            x: x + Math.sin(angle) * 40,
+            y: y - Math.cos(angle) * 40,
+            vx: Math.sin(angle) * BULLET_SPEED + vx,
+            vy: -Math.cos(angle) * BULLET_SPEED + vy,
+            life: BULLET_LIFE,
+        });
     },
 
-    updateAndDraw() {
+    update() {
         for (let i = this.list.length - 1; i >= 0; i--) {
             const b = this.list[i];
             b.x += b.vx; b.y += b.vy; b.life--;

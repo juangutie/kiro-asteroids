@@ -1,4 +1,4 @@
-import { canvas, ctx } from './canvas.js';
+import { canvas, ctx, wrapPosition } from './canvas.js';
 import sound from './sound.js';
 
 const SIZES        = { large: 90,  medium: 45, small: 20  };
@@ -9,6 +9,8 @@ const VERT_COUNT   = 10;
 const VERT_MIN_R   = 0.75;
 const VERT_JITTER  = 0.45;
 const SHIP_RADIUS  = 20; // approx collision radius added to asteroid size
+
+const INITIAL_ASTEROIDS = 5;
 
 const asteroids = {
     list: [],
@@ -25,6 +27,10 @@ const asteroids = {
         this.list.push({ x, y, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed, size, verts });
     },
 
+    spawnInitial() {
+        for (let i = 0; i < INITIAL_ASTEROIDS; i++) this.spawnAtEdge('large');
+    },
+
     spawnAtEdge(size) {
         const edge = Math.floor(Math.random() * 4);
         let x, y;
@@ -35,19 +41,20 @@ const asteroids = {
         this.spawn(size, x, y);
     },
 
-    update(bullets, ship, onScore, onHit) {
+    drift() {
+        for (const a of this.list) {
+            a.x += a.vx; a.y += a.vy;
+            wrapPosition(a);
+        }
+    },
+
+    checkCollisions(bullets, ship, onScore, onHit) {
         for (let i = this.list.length - 1; i >= 0; i--) {
             const a = this.list[i];
-            a.x += a.vx; a.y += a.vy;
-            if (a.x < 0) a.x = canvas.width;
-            if (a.x > canvas.width) a.x = 0;
-            if (a.y < 0) a.y = canvas.height;
-            if (a.y > canvas.height) a.y = 0;
 
             for (let j = bullets.length - 1; j >= 0; j--) {
                 const b = bullets[j];
-                const dx = b.x - a.x, dy = b.y - a.y;
-                if (Math.sqrt(dx * dx + dy * dy) < SIZES[a.size]) {
+                if (Math.hypot(b.x - a.x, b.y - a.y) < SIZES[a.size]) {
                     sound.collision();
                     onScore(POINTS[a.size]);
                     bullets.splice(j, 1);
@@ -61,8 +68,7 @@ const asteroids = {
             }
 
             if (i < this.list.length) {
-                const dx = ship.x - a.x, dy = ship.y - a.y;
-                if (Math.sqrt(dx * dx + dy * dy) < SIZES[a.size] + SHIP_RADIUS) {
+                if (Math.hypot(ship.x - a.x, ship.y - a.y) < SIZES[a.size] + SHIP_RADIUS) {
                     onHit();
                 }
             }

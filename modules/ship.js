@@ -1,6 +1,6 @@
-import { canvas, ctx } from './canvas.js';
-import { keys } from './input.js';
-import { getMouseState } from './mouse.js';
+import { canvas, ctx, wrapPosition } from './canvas.js';
+import { input } from './input.js';
+import bullets from './bullets.js';
 import sound from './sound.js';
 
 const SHIP_PATH = new Path2D();
@@ -48,6 +48,8 @@ function brakeJetPath() {
     return p;
 }
 
+export const INVULN_FRAMES = 120;
+
 const ship = {
     x: 0, y: 0,
     angle: 0,
@@ -55,6 +57,8 @@ const ship = {
     vx: 0, vy: 0,
     thrust: 0.2,
     friction: 0.98,
+    lives: 3,
+    invulnerableFrames: 0,
 
     thrusting: false,
     braking: false,
@@ -68,12 +72,29 @@ const ship = {
         this.angle = 0;
     },
 
+    fullReset() {
+        this.lives = 3;
+        this.invulnerableFrames = 0;
+        this.reset();
+    },
+
+    _canShoot: true,
+
     update() {
-        const mouse = getMouseState();
-        this.thrusting    = Boolean(keys.get('ArrowUp')    || keys.get('w') || mouse.up);
-        this.braking      = Boolean(keys.get('ArrowDown')  || keys.get('s') || mouse.down);
-        this.turningLeft  = Boolean(keys.get('ArrowLeft')  || keys.get('a') || mouse.left);
-        this.turningRight = Boolean(keys.get('ArrowRight') || keys.get('d') || mouse.right);
+        if (this.lives <= 0) return;
+
+        if (this.invulnerableFrames > 0) this.invulnerableFrames--;
+
+        this.thrusting    = input.isThrusting();
+        this.braking      = input.isBraking();
+        this.turningLeft  = input.isTurningLeft();
+        this.turningRight = input.isTurningRight();
+
+        if (input.isShooting() && this._canShoot) {
+            this._canShoot = false;
+            bullets.spawn(this.x, this.y, this.angle, this.vx, this.vy);
+        }
+        if (!input.isShooting()) this._canShoot = true;
 
         if (this.turningLeft)  this.angle -= this.rotSpeed;
         if (this.turningRight) this.angle += this.rotSpeed;
@@ -94,15 +115,12 @@ const ship = {
         }
         this.x += this.vx;
         this.y += this.vy;
-        if (this.x < 0) this.x = canvas.width;
-        if (this.x > canvas.width) this.x = 0;
-        if (this.y < 0) this.y = canvas.height;
-        if (this.y > canvas.height) this.y = 0;
+        wrapPosition(this);
     },
 
-    draw(lives, invulnerable) {
-        if (lives <= 0) return;
-        if (invulnerable > 0 && Math.floor(invulnerable / 4) % 2 === 0) return;
+    draw() {
+        if (this.lives <= 0) return;
+        if (this.invulnerableFrames > 0 && Math.floor(this.invulnerableFrames / 4) % 2 === 0) return;
         ctx.save();
         ctx.translate(this.x, this.y);
         ctx.rotate(this.angle);
