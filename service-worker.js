@@ -18,27 +18,10 @@ const URLS = [
 .map((url) => `/${REPOSITORY}${url}`)
 .map((url) => new Request(url, {cache: "no-cache"}));
 
-function setNoCache(response) {
-    const updatedHeaders = new Headers(response.headers);
-    updatedHeaders.set("Cache-Control", "no-cache");
-
-    return new Response(response.body, {
-        status: response.status,
-        statusText: response.statusText,
-        headers: updatedHeaders,
-    });
-}
-
 self.addEventListener("install", (event) => {
     event.waitUntil(
         caches.open(`${REPOSITORY}_${CACHE_VERSION}`).then((cache) =>
-            cache.addAll(URLS).then(() =>
-                URLS.map((request) =>
-                    cache.match(request).then((response) =>
-                        cache.put(request, setNoCache(response))
-                    )
-                )
-            )
+            cache.addAll(URLS)
         )
     );
 });
@@ -64,7 +47,7 @@ self.addEventListener("fetch", (event) => {
                         const responseCopy = response.clone();
                         event.waitUntil(
                             caches.open(`${REPOSITORY}_${CACHE_VERSION}`).then((cache) =>
-                                cache.put(event.request, setNoCache(responseCopy))
+                                cache.put(event.request, responseCopy)
                             )
                         );
                     }
