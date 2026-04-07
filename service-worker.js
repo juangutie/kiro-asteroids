@@ -1,7 +1,5 @@
 const REPOSITORY = "kiro-asteroids";
 const VERSION = "v13";
-const STATIC_CACHE = `${REPOSITORY}_static_${VERSION}`;
-const DYNAMIC_CACHE = `${REPOSITORY}_dynamic_${VERSION}`;
 const URLS = [
     "/",
     "/favicon.ico",
@@ -20,6 +18,9 @@ const URLS = [
 ]
 .map((url) => `/${REPOSITORY}${url}`)
 .map((url) => new Request(url, {cache: "no-cache"}));
+
+const STATIC_CACHE = `${REPOSITORY}_static_${VERSION}`;
+const DYNAMIC_CACHE = `${REPOSITORY}_dynamic_${VERSION}`;
 
 self.addEventListener("install", (event) => {
     event.waitUntil(
