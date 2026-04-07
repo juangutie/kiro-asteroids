@@ -1,7 +1,7 @@
 const REPOSITORY = "kiro-asteroids";
-const VERSION = "v12";
+const VERSION = "v13";
 const STATIC_CACHE = `${REPOSITORY}_static_${VERSION}`;
-const DYNAMIC_CACHE = `${REPOSITORY}_dynamic`;
+const DYNAMIC_CACHE = `${REPOSITORY}_dynamic_${VERSION}`;
 const URLS = [
     "/",
     "/favicon.ico",
