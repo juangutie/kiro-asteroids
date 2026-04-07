@@ -1,10 +1,11 @@
 const REPOSITORY = "kiro-asteroids";
-const VERSION = "v11";
+const VERSION = "v12";
 const STATIC_CACHE = `${REPOSITORY}_static_${VERSION}`;
 const DYNAMIC_CACHE = `${REPOSITORY}_dynamic`;
 const URLS = [
     "/",
     "/favicon.ico",
+    "/fonts/PressStart2P.woff2",
     "/index.html",
     "/main.js",
     "/modules/asteroids.js",

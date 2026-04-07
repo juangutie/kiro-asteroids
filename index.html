@@ -4,7 +4,11 @@
     <title>Asteroids</title>
     <link rel="icon" href="favicon.ico">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+        @font-face {
+            font-family: 'Press Start 2P';
+            src: url('/kiro-asteroids/fonts/PressStart2P.woff2') format('woff2');
+            font-display: block;
+        }
         body { margin: 0; background: #000; }
         canvas { display: block; width: 100vw; height: 100vh; }
         @media (pointer: coarse) { canvas { height: 100dvh; } }
