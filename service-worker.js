@@ -1,5 +1,5 @@
 const REPOSITORY = "kiro-asteroids";
-const VERSION = "v14";
+const VERSION = "v15";
 const URLS = [
     "/",
     "/favicon.ico",

@@ -82,3 +82,16 @@ requestAnimationFrame(function loop() {
 });
 
 navigator?.serviceWorker.register('/kiro-asteroids/service-worker.js', { scope: '/kiro-asteroids/' });
+
+const presourcelink = window.document.querySelector(".presourcelink");
+const sourcelink = window.document.querySelector(".sourcelink");
+
+presourcelink.addEventListener("focusin", (event) => {
+  event.target.blur();
+});
+
+sourcelink.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") {
+    presourcelink.focus()
+  }
+});
