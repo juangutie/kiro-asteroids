@@ -80,10 +80,10 @@ const ship = {
 
     _canShoot: true,
 
-    update() {
+    update(dt) {
         if (this.lives <= 0) return;
 
-        if (this.invulnerableFrames > 0) this.invulnerableFrames--;
+        if (this.invulnerableFrames > 0) this.invulnerableFrames -= dt;
 
         this.thrusting    = input.isThrusting();
         this.braking      = input.isBraking();
@@ -96,25 +96,26 @@ const ship = {
         }
         if (!input.isShooting()) this._canShoot = true;
 
-        if (this.turningLeft)  this.angle -= this.rotSpeed;
-        if (this.turningRight) this.angle += this.rotSpeed;
+        if (this.turningLeft)  this.angle -= this.rotSpeed * dt;
+        if (this.turningRight) this.angle += this.rotSpeed * dt;
         if (this.thrusting) {
-            this.vx += Math.sin(this.angle) * this.thrust;
-            this.vy -= Math.cos(this.angle) * this.thrust;
+            this.vx += Math.sin(this.angle) * this.thrust * dt;
+            this.vy -= Math.cos(this.angle) * this.thrust * dt;
         }
-        this.vx *= this.braking ? 0.94 : this.friction;
-        this.vy *= this.braking ? 0.94 : this.friction;
+        const friction = this.braking ? 0.94 : this.friction;
+        this.vx *= Math.pow(friction, dt);
+        this.vy *= Math.pow(friction, dt);
         if (this.braking) {
-            this.vx -= Math.sin(this.angle) * this.thrust * 0.5;
-            this.vy += Math.cos(this.angle) * this.thrust * 0.5;
+            this.vx -= Math.sin(this.angle) * this.thrust * 0.5 * dt;
+            this.vy += Math.cos(this.angle) * this.thrust * 0.5 * dt;
         }
 
         if (this.thrusting || this.braking || this.turningLeft || this.turningRight) {
             const speed = Math.sqrt(this.vx * this.vx + this.vy * this.vy);
             sound.thrust(speed);
         }
-        this.x += this.vx;
-        this.y += this.vy;
+        this.x += this.vx * dt;
+        this.y += this.vy * dt;
         wrapPosition(this);
     },
 

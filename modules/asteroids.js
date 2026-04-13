@@ -41,9 +41,9 @@ const asteroids = {
         this.spawn(size, x, y);
     },
 
-    drift() {
+    drift(dt) {
         for (const a of this.list) {
-            a.x += a.vx; a.y += a.vy;
+            a.x += a.vx * dt; a.y += a.vy * dt;
             wrapPosition(a);
         }
     },

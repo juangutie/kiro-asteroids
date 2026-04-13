@@ -60,15 +60,19 @@ initMouse(() => ship);
 
 init();
 
-requestAnimationFrame(function loop() {
+let lastTime = 0;
+
+requestAnimationFrame(function loop(timestamp) {
     requestAnimationFrame(loop);
+    const dt = lastTime ? Math.min((timestamp - lastTime) / (1000 / 60), 3) : 1;
+    lastTime = timestamp;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     if (input.isRestarting() && restartAllowed) init();
 
-    ship.update();
-    asteroids.drift();
-    bullets.update();
+    ship.update(dt);
+    asteroids.drift(dt);
+    bullets.update(dt);
 
     if (state === 'playing') {
         asteroids.checkCollisions(bullets.list, ship, onAsteroidScored, onShipHit);

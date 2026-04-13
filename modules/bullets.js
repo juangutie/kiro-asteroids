@@ -18,10 +18,10 @@ const bullets = {
         });
     },
 
-    update() {
+    update(dt) {
         for (let i = this.list.length - 1; i >= 0; i--) {
             const b = this.list[i];
-            b.x += b.vx; b.y += b.vy; b.life--;
+            b.x += b.vx * dt; b.y += b.vy * dt; b.life -= dt;
             if (b.life <= 0) { this.list.splice(i, 1); continue; }
             ctx.beginPath();
             ctx.arc(b.x, b.y, 5, 0, Math.PI * 2);
