@@ -61,6 +61,9 @@ I told Kiro to start with a ship that moves and turns around in space. I told it
 
 Yeah, yeah, it works and whatever and there's no obvious bugs. But adding more features to this would become a nightmare. The AI doesn't out-of-the-box differentiate between a job done and job well done. It replicates outdated snippets of stackoverflow code, and if you ask it to add a feature, it doesn't mind leaving a heaping pile of mess in its wake. Each time I tried getting it to refactor, pointing out specific issues, Kiro went on credit spending sprees for wee improvements.
 
+> [!NOTE]  
+> I realized after writing this that I was using Kiro's default model setting which automatically switches between big and small models. It does this opaquely, so I don't know how much of Kiro's results are representative of the latest LLMs.
+
 ### There is a learning curve.
 
 <img align="right" src="explain.gif">
