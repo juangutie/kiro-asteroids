@@ -69,3 +69,6 @@ Yeah, yeah, it works and whatever and there's no obvious bugs. But adding more f
 <img align="right" src="explain.gif">
 
 I have some opinions about how code should be written. There is also a whole lot that I don't know about. Whether it's through agent skills, steering, spec-driven development or whatnot, if I can impart some of my opinions unto the AI agent, I can spend less time wrestling with it and more time creating.
+
+> [!NOTE]
+> [2026-04-28] Also realized that, in addition to stronger models and added context, my prompts themselves could be more effective using the tips from [this guide](https://shumer.dev/prompting-ai-agents). Much of this effectiveness however sounds like it comes at a greater dollar/energy cost.
