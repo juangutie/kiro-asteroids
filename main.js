@@ -85,7 +85,7 @@ requestAnimationFrame(function loop(timestamp) {
     drawTurnZone(ctx, ship, state === 'gameover');
 });
 
-navigator?.serviceWorker.register('/kiro-asteroids/service-worker.js', { scope: '/kiro-asteroids/' });
+navigator.serviceWorker?.register('/kiro-asteroids/service-worker.js', { scope: '/kiro-asteroids/' });
 
 const presourcelink = window.document.querySelector(".presourcelink");
 const sourcelink = window.document.querySelector(".sourcelink");
